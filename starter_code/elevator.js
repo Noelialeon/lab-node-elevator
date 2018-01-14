@@ -15,17 +15,18 @@ class Elevator {
   }
 
   stop() {
-    clearInterval(updateElevator);
+    clearInterval();
   }
 
   update() {
-    switch (this.direction) {
-      case 'up':
-      this.floorUp();
-      break;
-      case 'down':
+    if(this.requests.length === 0){
+      this.stop();
+    } else if (this.floor > this.requests[0]){
+      this.direction = "down";
       this.floorDown();
-      break;
+    } else if (this.floor < this.requests[0]){
+      this.direction = "up";
+      this.floorUp();
     };
     this.log();
     this._passengersEnter();
@@ -46,6 +47,7 @@ class Elevator {
   _passengersLeave() {
     this.passengersLeaving = this.passengers.filter(passengers => passengers.destinationFloor === this.floor);
     this.passengers = this.passengers.filter(actualPassengers => actualPassengers.destinationFloor !== this.floor);
+    this.requests = this.requests.filter(doneRequests => doneRequests !== this.floor);
     if(this.passengersLeaving.length !== 0){
     console.log(`${this.passengersLeaving.map(passengers => passengers.name)} has left the elevator`);
     };
@@ -76,7 +78,7 @@ class Elevator {
   }
 
   log() {
-    console.log(`Direction: ${this.direction} | Floor: ${this.floor} | Passengers: ${this.passengers.map(passengers => passengers.name).join(', ')}`)
+    console.log(`Direction: ${this.direction} | Floor: ${this.floor} | Passengers: ${this.passengers.map(passengers => passengers.name).join(', ')} | Next stop: ${this.requests[0]}`)
   }
 }
 
